@@ -27,7 +27,8 @@ import androidx.compose.material.icons.filled.Fingerprint
 
 @Composable
 fun PinScreen(
-    pinLength: Int = 5,
+    pinLength: Int = 6,
+    message: String,
     onPinComplete: (String) -> Unit,
     shakeOffset: Float = 0f
 ) {
@@ -44,7 +45,7 @@ fun PinScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Enter PIN",
+                text = message,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -144,13 +145,16 @@ fun PinKeyboardStyled(
                         }
 
                         else -> {
+                            val isDelete = key == "⌫"
                             Box(
                                 modifier = Modifier
                                     .size(90.dp)
                                     .scale(scale)
-                                    .background(Color(0xFFF1F1F1), shape = RoundedCornerShape(32.dp))
+                                    .background(
+                                        color = if (isDelete) Color(0xAAFFD1DC) else Color(0xFFF1F1F1),
+                                        shape = RoundedCornerShape(32.dp))
                                     .clickable {
-                                        if (key == "⌫") onDeleteClick()
+                                        if (isDelete) onDeleteClick()
                                         else onNumberClick(key)
                                     },
                                 contentAlignment = Alignment.Center
@@ -159,7 +163,7 @@ fun PinKeyboardStyled(
                                     key,
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = Color.Black
+                                    color = if (isDelete) Color.Red else Color.Black
                                 )
                             }
                         }
@@ -169,54 +173,6 @@ fun PinKeyboardStyled(
         }
     }
 }
-
-//@Composable
-//fun FingerprintLogin(
-//    onSuccess: () -> Unit,
-//    onError: (String) -> Unit
-//) {
-//    val context = LocalContext.current
-//    val activity = context as FragmentActivity
-//
-//    val executor = ContextCompat.getMainExecutor(context)
-//
-//    val biometricPrompt = remember {
-//        BiometricPrompt(activity, executor,
-//            object : BiometricPrompt.AuthenticationCallback() {
-//                override fun onAuthenticationSucceeded(
-//                    result: BiometricPrompt.AuthenticationResult
-//                ) {
-//                    super.onAuthenticationSucceeded(result)
-//                    onSuccess()
-//                }
-//
-//                override fun onAuthenticationError(
-//                    errorCode: Int,
-//                    errString: CharSequence
-//                ) {
-//                    super.onAuthenticationError(errorCode, errString)
-//                    onError(errString.toString())
-//                }
-//
-//                override fun onAuthenticationFailed() {
-//                    super.onAuthenticationFailed()
-//                    onError("Authentication failed")
-//                }
-//            })
-//    }
-//
-//    val promptInfo = remember {
-//        BiometricPrompt.PromptInfo.Builder()
-//            .setTitle("Вход по отпечатку")
-//            .setSubtitle("Используйте биометрию для входа")
-//            .setNegativeButtonText("Отмена")
-//            .build()
-//    }
-//
-//    LaunchedEffect(Unit) {
-//        biometricPrompt.authenticate(promptInfo)
-//    }
-//}
 
 fun FingerprintLogin(
     activity: FragmentActivity,
