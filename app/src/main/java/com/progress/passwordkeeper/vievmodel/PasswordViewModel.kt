@@ -34,4 +34,19 @@ class PasswordViewModel(application: Application) : AndroidViewModel(application
             _passwords.value = dao.getAll()
         }
     }
+
+    fun deletePassword(id: Int) {
+        viewModelScope.launch {
+            dao.deleteById(id)
+            _passwords.value = dao.getAll()
+        }
+    }
+
+    fun updatePassword(entry: PasswordEntry) {
+        viewModelScope.launch {
+            dao.update(entry)
+            _passwords.value = dao.getAll()
+        }
+    }
+
 }
