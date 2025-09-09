@@ -17,12 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.fragment.app.FragmentActivity
 import com.progress.passwordkeeper.data.PasswordEntry
+import com.progress.passwordkeeper.getSecurePrefs
+import com.progress.passwordkeeper.hashPin
 import com.progress.passwordkeeper.vievmodel.PasswordViewModel
 
 @Composable
 fun PasswordListScreen(viewModel: PasswordViewModel) {
     val passwords by viewModel.passwords.collectAsState(initial = emptyList())
     var showDialog by remember { mutableStateOf(false) }
+    var showChangePinDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
@@ -56,7 +59,7 @@ fun PasswordListScreen(viewModel: PasswordViewModel) {
                 )
 
                 IconButton(
-                    onClick = { /* TODO: смена ПИН */ },
+                    onClick = { showChangePinDialog = true },
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
                     Icon(
@@ -88,6 +91,12 @@ fun PasswordListScreen(viewModel: PasswordViewModel) {
                     viewModel.addPassword(app, login, pass)
                     showDialog = false
                 }
+            )
+        }
+
+        if (showChangePinDialog) {
+            ChangePinDialog(
+                onDismiss = { showChangePinDialog = false }
             )
         }
     }
@@ -321,6 +330,94 @@ fun UpdatePasswordDialog(
             TextButton(onClick = onDismiss) {
                 Text("Отмена")
             }
+        }
+    )
+}
+
+@Composable
+fun ChangePinDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = remember { getSecurePrefs(context) }
+    val savedHash = prefs.getString("pin_hash", null)
+
+    var step by remember { mutableStateOf(0) } // 0 = ввод старого, 1 = новый, 2 = повтор
+    var oldPin by remember { mutableStateOf("") }
+    var newPin by remember { mutableStateOf("") }
+    var repeatPin by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Смена PIN") },
+        text = {
+            Column {
+                when (step) {
+                    0 -> OutlinedTextField(
+                        value = oldPin,
+                        onValueChange = { oldPin = it },
+                        label = { Text("Старый PIN") },
+                        singleLine = true
+                    )
+                    1 -> OutlinedTextField(
+                        value = newPin,
+                        onValueChange = { newPin = it },
+                        label = { Text("Новый PIN") },
+                        singleLine = true
+                    )
+                    2 -> OutlinedTextField(
+                        value = repeatPin,
+                        onValueChange = { repeatPin = it },
+                        label = { Text("Повторите PIN") },
+                        singleLine = true
+                    )
+                }
+
+                if (error != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(error!!, color = Color.Red)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                when (step) {
+                    0 -> {
+                        if (savedHash != null && hashPin(oldPin) == savedHash) {
+                            step = 1
+                            error = null
+                        } else {
+                            error = "Неверный старый PIN"
+                        }
+                    }
+                    1 -> {
+                        if (newPin.length < 4) {
+                            error = "PIN слишком короткий"
+                        } else {
+                            step = 2
+                            error = null
+                        }
+                    }
+                    2 -> {
+                        if (newPin == repeatPin) {
+                            prefs.edit().putString("pin_hash", hashPin(newPin)).apply()
+                            onDismiss()
+                        } else {
+                            error = "PIN не совпадает"
+                        }
+                    }
+                }
+            }) {
+                Text(
+                    when (step) {
+                        0 -> "Далее"
+                        1 -> "Продолжить"
+                        else -> "Сохранить"
+                    }
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Отмена") }
         }
     )
 }
