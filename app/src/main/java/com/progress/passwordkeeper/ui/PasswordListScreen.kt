@@ -12,8 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.fragment.app.FragmentActivity
 import com.progress.passwordkeeper.data.PasswordEntry
 import com.progress.passwordkeeper.vievmodel.PasswordViewModel
 
@@ -101,6 +103,8 @@ fun PasswordItem(
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val activity = context as? FragmentActivity
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -136,7 +140,19 @@ fun PasswordItem(
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(onClick = {
+                        if (!passwordVisible) { // только при попытке показать
+                            activity?.let { act ->
+                                FingerprintLogin(
+                                    activity = act,
+                                    onSuccess = { passwordVisible = true },
+                                    onError = { error -> println("Ошибка биометрии: $error") }
+                                )
+                            }
+                        } else {
+                            passwordVisible = false
+                        }
+                    }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = if (passwordVisible) "Скрыть" else "Показать"
