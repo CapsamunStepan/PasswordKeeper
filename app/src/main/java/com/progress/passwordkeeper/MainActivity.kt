@@ -53,8 +53,6 @@ fun MainScreen(viewModel: PasswordViewModel, context: Context) {
 
     // prefs
     val prefs = remember { getSecurePrefs(context) }
-    // A way to drop pin, I can use it to change PIN, I need to input old PIN before
-//        prefs.edit().remove("pin_hash").apply()
     val savedHash = prefs.getString("pin_hash", null)
 
     var shakeOffset by remember { mutableFloatStateOf(0f) }
