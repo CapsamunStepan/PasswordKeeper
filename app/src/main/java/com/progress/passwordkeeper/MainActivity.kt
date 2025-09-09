@@ -54,7 +54,7 @@ fun MainScreen(viewModel: PasswordViewModel, context: Context) {
     // prefs
     val prefs = remember { getSecurePrefs(context) }
     // A way to drop pin, I can use it to change PIN, I need to input old PIN before
-//    prefs.edit().remove("pin_hash").apply()
+//        prefs.edit().remove("pin_hash").apply()
     val savedHash = prefs.getString("pin_hash", null)
 
     var shakeOffset by remember { mutableFloatStateOf(0f) }
@@ -86,7 +86,7 @@ fun MainScreen(viewModel: PasswordViewModel, context: Context) {
                         if (firstPin == enteredPin) {
                             prefs.edit().putString("pin_hash", hashPin(enteredPin)).apply()
                             // splash message
-//                            message = "PIN успешно установлен"
+                            //                            message = "PIN успешно установлен"
                             isAuthenticated = true
                         } else {
                             firstPin = null
@@ -107,7 +107,8 @@ fun MainScreen(viewModel: PasswordViewModel, context: Context) {
                     }
                 }
             },
-            shakeOffset = shakeOffset
+            shakeOffset = shakeOffset,
+            autoBiometric = savedHash != null
         )
 
 

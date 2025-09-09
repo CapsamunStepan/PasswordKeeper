@@ -30,11 +30,22 @@ fun PinScreen(
     pinLength: Int = 6,
     message: String,
     onPinComplete: (String) -> Unit,
-    shakeOffset: Float = 0f
+    shakeOffset: Float = 0f,
+    autoBiometric: Boolean = false,
 ) {
     var pin by remember { mutableStateOf("") }
     val context: Context = LocalContext.current
     val activity = context as? FragmentActivity
+
+    LaunchedEffect(autoBiometric) {
+        if (autoBiometric && activity != null) {
+            FingerprintLogin(
+                activity = activity,
+                onSuccess = { onPinComplete("fingerprint") },
+                onError = { error -> println("Ошибка биометрии: $error") }
+            )
+        }
+    }
 
     Column(
         modifier = Modifier
