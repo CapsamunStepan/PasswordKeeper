@@ -199,60 +199,6 @@ fun PasswordItem(
     }
 }
 
-
-//@Composable
-//fun AddPasswordDialog(
-//    onDismiss: () -> Unit,
-//    onSave: (String, String, String) -> Unit
-//) {
-//    var appName by remember { mutableStateOf("") }
-//    var login by remember { mutableStateOf("") }
-//    var password by remember { mutableStateOf("") }
-//
-//    AlertDialog(
-//        onDismissRequest = onDismiss,
-//        title = { Text("Добавить аккаунт") },
-//        text = {
-//            Column {
-//                OutlinedTextField(
-//                    value = appName,
-//                    onValueChange = { appName = it },
-//                    label = { Text("Название приложения") },
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//                OutlinedTextField(
-//                    value = login,
-//                    onValueChange = { login = it },
-//                    label = { Text("Логин") },
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//                OutlinedTextField(
-//                    value = password,
-//                    onValueChange = { password = it },
-//                    label = { Text("Пароль") },
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//            }
-//        },
-//        confirmButton = {
-//            TextButton(onClick = {
-//                if (appName.isNotBlank() && login.isNotBlank() && password.isNotBlank()) {
-//                    onSave(appName, login, password)
-//                }
-//            }) {
-//                Text("Сохранить")
-//
-//            }
-//        },
-//        dismissButton = {
-//            TextButton(onClick = onDismiss) {
-//                Text("Отмена")
-//            }
-//        }
-//    )
-//}
-
-
 @Composable
 fun AddPasswordDialog(
     onDismiss: () -> Unit,
